@@ -13,7 +13,7 @@ class ProductService extends ApiService {
     limit: number
   ): Promise<Product[]> {
     return this.get<Product[]>(
-      `/products/${category}?=offset=${offset}&limit=${limit}`
+      `/products/${category}?offset=${offset}&limit=${limit}`
     );
   }
 

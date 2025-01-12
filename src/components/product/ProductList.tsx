@@ -1,8 +1,9 @@
 "use client";
-
+import { useEffect, useState } from "react";
 import { Product, ProductCategories } from "@/types/product";
 import { ProductItem } from "./ProductItem";
 import styled from "styled-components";
+import { useProducts } from "@/hooks/useProducts";
 
 const Wrapper = styled.section`
   display: flex;
@@ -12,25 +13,48 @@ const Wrapper = styled.section`
   border: 1px solid black;
   border-radius: 1rem;
   padding: 1rem;
+  flex-wrap: wrap;
+`;
+
+const LoadMoreButton = styled.button`
+  padding: 0.5rem 1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
 `;
 
 interface ProductListProps {
-  products: Product[];
   title: string;
-  isLoading?: boolean;
   category: ProductCategories;
+  initialData?: Product[];
 }
 
-export function ProductList({ products, title, isLoading }: ProductListProps) {
+export function ProductList({
+  title,
+  category,
+  initialData,
+}: ProductListProps) {
+  const [page, setPage] = useState(0);
+  const { data, isLoading, refetch } = useProducts(category, page, initialData);
+
+  useEffect(() => {
+    refetch();
+  }, [page]);
   if (isLoading) {
     return <div>Loading...</div>;
   }
-
   return (
     <section>
       <h2>{title}</h2>
       <Wrapper>
-        {products.map(({ id, image, title, category }) => (
+        {data.map(({ id, image, title, category }) => (
           <ProductItem
             key={id}
             id={id}
@@ -39,6 +63,22 @@ export function ProductList({ products, title, isLoading }: ProductListProps) {
             category={category}
           />
         ))}
+        <LoadMoreButton
+          onClick={() => {
+            setPage(page - 1);
+          }}
+          disabled={isLoading || page === 0}
+        >
+          {isLoading ? "Loading..." : "Prev"}
+        </LoadMoreButton>
+        <LoadMoreButton
+          onClick={() => {
+            setPage(page + 1);
+          }}
+          disabled={isLoading}
+        >
+          {isLoading ? "Loading..." : "Next"}
+        </LoadMoreButton>
       </Wrapper>
     </section>
   );

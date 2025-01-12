@@ -1,11 +1,12 @@
 import { ProductList } from "@/components/product/ProductList";
-import { productService } from "@/services/product.service";
 import { Product } from "@/types/product";
 import {
   HydrationBoundary,
   QueryClient,
   dehydrate,
 } from "@tanstack/react-query";
+import { getProducts } from "./actions";
+import { PRODUCTS_PER_PAGE } from "@/hooks/useProducts";
 
 async function getInitialProducts(): Promise<{
   top: Product[];
@@ -13,9 +14,9 @@ async function getInitialProducts(): Promise<{
   recent: Product[];
 }> {
   const [top, exclusive, recent] = await Promise.all([
-    productService.getProducts("top", 0, 6),
-    productService.getProducts("exclusive", 0, 6),
-    productService.getProducts("recent", 0, 6),
+    getProducts("top", 0, PRODUCTS_PER_PAGE),
+    getProducts("exclusive", 0, PRODUCTS_PER_PAGE),
+    getProducts("recent", 0, PRODUCTS_PER_PAGE),
   ]);
 
   return { top, exclusive, recent };
@@ -27,33 +28,36 @@ export default async function Home() {
 
   // Prefetch and cache the data
   await Promise.all([
-    queryClient.prefetchQuery({
-      queryKey: ["products", "top", 1, 6],
+    queryClient.prefetchInfiniteQuery({
+      queryKey: ["products", "top"],
       queryFn: () => Promise.resolve(top),
+      initialPageParam: 0,
     }),
-    queryClient.prefetchQuery({
-      queryKey: ["products", "exclusive", 1, 6],
+    queryClient.prefetchInfiniteQuery({
+      queryKey: ["products", "exclusive"],
       queryFn: () => Promise.resolve(exclusive),
+      initialPageParam: 0,
     }),
-    queryClient.prefetchQuery({
-      queryKey: ["products", "recent", 1, 6],
+    queryClient.prefetchInfiniteQuery({
+      queryKey: ["products", "recent"],
       queryFn: () => Promise.resolve(recent),
+      initialPageParam: 0,
     }),
   ]);
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <main>
-        <ProductList products={top} title="Top Products" category="top" />
+        <ProductList title="Top Products" category="top" initialData={top} />
         <ProductList
-          products={exclusive}
           title="Exclusive Products"
           category="exclusive"
+          initialData={exclusive}
         />
         <ProductList
-          products={recent}
           title="Recent Products"
           category="recent"
+          initialData={recent}
         />
       </main>
     </HydrationBoundary>
