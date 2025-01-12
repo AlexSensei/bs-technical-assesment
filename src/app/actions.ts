@@ -12,6 +12,10 @@ export async function getProducts(
   return productService.getProducts(category, offset, limit);
 }
 
+export async function getProduct(id: string): Promise<Product> {
+  return productService.getProductById(id);
+}
+
 export async function getComments(id: string): Promise<string[]> {
   return productService.getComments(id);
 }
