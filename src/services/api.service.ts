@@ -19,7 +19,7 @@ class ApiService {
       throw error;
     }
   }
-
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected async post<T>(endpoint: string, data: any): Promise<T> {
     try {
       const response = await fetch(`${this.baseURL}${endpoint}`, {

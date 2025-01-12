@@ -22,5 +22,4 @@ class ProductService extends ApiService {
   }
 }
 
-// Create a singleton instance
 export const productService = new ProductService();
