@@ -4,7 +4,14 @@ import { useProduct } from "@/hooks/useProduct";
 import Image from "next/image";
 import Link from "next/link";
 import styled from "styled-components";
-import { Comments } from "./Comments";
+
+import { Suspense } from "react";
+import dynamic from "next/dynamic";
+
+const Comments = dynamic(() => import("./Comments"), {
+  ssr: false,
+  loading: () => <div>Loading comments...</div>,
+});
 
 const Wrapper = styled.div`
   display: flex;
@@ -81,8 +88,9 @@ export function ProductDetail({ id }: ProductDetailProps) {
       />
 
       <FavoriteButton>Add to Favorites</FavoriteButton>
-
-      <Comments productId={id} />
+      <Suspense>
+        <Comments productId={id} />
+      </Suspense>
     </Wrapper>
   );
 }

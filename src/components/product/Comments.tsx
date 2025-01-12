@@ -1,7 +1,7 @@
 "use client";
 
-import { Comment } from "@/types/product";
 import styled from "styled-components";
+import { useComments } from "@/hooks/useComments";
 
 const CommentsSection = styled.div`
   width: 100%;
@@ -44,41 +44,33 @@ const SectionTitle = styled.h3`
   color: #333;
 `;
 
-const mockComments: Comment[] = [
-  {
-    id: "1",
-    text: "Great product! Really happy with my purchase.",
-    author: "John Doe",
-    createdAt: "2024-03-20T10:00:00Z",
-  },
-  {
-    id: "2",
-    text: "The quality is amazing, highly recommend!",
-    author: "Jane Smith",
-    createdAt: "2024-03-19T15:30:00Z",
-  },
-];
-
 interface CommentsProps {
   productId: string;
 }
 
-export function Comments({ productId }: CommentsProps) {
+export default function Comments({ productId }: CommentsProps) {
+  const { data: comments, isLoading } = useComments(productId);
+
+  if (isLoading) {
+    return <div>Loading comments...</div>;
+  }
+  console.log({ comments });
+  if (!comments || comments.length === 0) {
+    return (
+      <CommentsSection>
+        <SectionTitle>Comments</SectionTitle>
+        <p>No comments yet.</p>
+      </CommentsSection>
+    );
+  }
+
   return (
     <CommentsSection>
-      <SectionTitle>Comments for product {productId}</SectionTitle>
+      <SectionTitle>Comments</SectionTitle>
       <CommentsList>
-        {mockComments.map((comment) => (
-          <CommentItem key={comment.id}>
-            <h4>{comment.author}</h4>
-            <p>{comment.text}</p>
-            <small>
-              {new Date(comment.createdAt).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </small>
+        {comments.map((comment) => (
+          <CommentItem key={comment}>
+            <h4>{comment}</h4>
           </CommentItem>
         ))}
       </CommentsList>

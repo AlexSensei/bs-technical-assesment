@@ -20,6 +20,10 @@ class ProductService extends ApiService {
   async getProductById(id: string): Promise<Product> {
     return this.get<Product>(`/product?id=${id}`);
   }
+
+  async getComments(id: string) {
+    return this.get<string[]>(`/comments?id=${id}`);
+  }
 }
 
 export const productService = new ProductService();

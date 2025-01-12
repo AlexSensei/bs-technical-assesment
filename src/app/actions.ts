@@ -11,3 +11,7 @@ export async function getProducts(
   const offset = page * limit;
   return productService.getProducts(category, offset, limit);
 }
+
+export async function getComments(id: string): Promise<string[]> {
+  return productService.getComments(id);
+}
