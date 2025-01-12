@@ -15,3 +15,7 @@ export async function getProducts(
 export async function getComments(id: string): Promise<string[]> {
   return productService.getComments(id);
 }
+
+export async function getFavorites(): Promise<string[]> {
+  return productService.getFavorites();
+}

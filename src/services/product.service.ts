@@ -24,6 +24,44 @@ class ProductService extends ApiService {
   async getComments(id: string) {
     return this.get<string[]>(`/comments?id=${id}`);
   }
+
+  async getFavorites() {
+    return this.get<string[]>("/favorites", {
+      headers: {
+        // TODO: Move this to either env or give user chance to input his x-api-key
+        "x-api-key": "secret-key-bitstarz",
+      },
+    });
+  }
+
+  async addToFavorites(productId: string) {
+    return this.post<void>(
+      "/favorites",
+      {
+        id: productId,
+      },
+      {
+        headers: {
+          "x-api-key": "secret-key-bitstarz",
+        },
+      }
+    );
+  }
+
+  async removeFromFavorites(productId: string) {
+    console.log("REMOVE FROM FAVORITES");
+    return this.delete<void>(
+      "/favorites",
+      {
+        id: productId,
+      },
+      {
+        headers: {
+          "x-api-key": "secret-key-bitstarz",
+        },
+      }
+    );
+  }
 }
 
 export const productService = new ProductService();

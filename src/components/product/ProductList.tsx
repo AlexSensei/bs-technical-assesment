@@ -4,6 +4,7 @@ import { Product, ProductCategories } from "@/types/product";
 import { ProductItem } from "./ProductItem";
 import styled from "styled-components";
 import { useProducts } from "@/hooks/useProducts";
+import { useFavorites } from "@/hooks/useFavorites";
 
 const Wrapper = styled.section`
   display: flex;
@@ -41,12 +42,14 @@ export function ProductList({
   category,
   initialData,
 }: ProductListProps) {
+  const { favorites } = useFavorites();
+
   const [page, setPage] = useState(0);
   const { data, isLoading, refetch } = useProducts(category, page, initialData);
 
   useEffect(() => {
     refetch();
-  }, [page]);
+  }, [page, refetch]);
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -61,6 +64,7 @@ export function ProductList({
             image={image}
             title={title}
             category={category}
+            isFavorite={favorites?.some((fav) => fav === id)}
           />
         ))}
         <LoadMoreButton

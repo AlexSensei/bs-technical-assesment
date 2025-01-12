@@ -7,6 +7,7 @@ import styled from "styled-components";
 
 import { Suspense } from "react";
 import dynamic from "next/dynamic";
+import { useFavorites } from "@/hooks/useFavorites";
 
 const Comments = dynamic(() => import("./Comments"), {
   ssr: false,
@@ -62,6 +63,15 @@ interface ProductDetailProps {
 
 export function ProductDetail({ id }: ProductDetailProps) {
   const { data: product, isLoading } = useProduct(id);
+  const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
+
+  const handleFavoriteClick = () => {
+    if (isFavorite(id)) {
+      removeFromFavorites.mutate(id);
+    } else {
+      addToFavorites.mutate(id);
+    }
+  };
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -87,7 +97,12 @@ export function ProductDetail({ id }: ProductDetailProps) {
         priority
       />
 
-      <FavoriteButton>Add to Favorites</FavoriteButton>
+      <FavoriteButton
+        onClick={handleFavoriteClick}
+        disabled={addToFavorites.isPending || removeFromFavorites.isPending}
+      >
+        {isFavorite(id) ? "Remove from favorites" : "Add to favorites"}
+      </FavoriteButton>
       <Suspense>
         <Comments productId={id} />
       </Suspense>

@@ -5,26 +5,28 @@ import {
   QueryClient,
   dehydrate,
 } from "@tanstack/react-query";
-import { getProducts } from "./actions";
+import { getProducts, getFavorites } from "./actions";
 import { PRODUCTS_PER_PAGE } from "@/hooks/useProducts";
 
 async function getInitialProducts(): Promise<{
   top: Product[];
   exclusive: Product[];
   recent: Product[];
+  favorites: string[];
 }> {
-  const [top, exclusive, recent] = await Promise.all([
+  const [top, exclusive, recent, favorites] = await Promise.all([
     getProducts("top", 0, PRODUCTS_PER_PAGE),
     getProducts("exclusive", 0, PRODUCTS_PER_PAGE),
     getProducts("recent", 0, PRODUCTS_PER_PAGE),
+    getFavorites(),
   ]);
 
-  return { top, exclusive, recent };
+  return { top, exclusive, recent, favorites };
 }
 
 export default async function Home() {
   const queryClient = new QueryClient();
-  const { top, exclusive, recent } = await getInitialProducts();
+  const { top, exclusive, recent, favorites } = await getInitialProducts();
 
   // Prefetch and cache the data
   await Promise.all([
@@ -42,6 +44,10 @@ export default async function Home() {
       queryKey: ["products", "recent"],
       queryFn: () => Promise.resolve(recent),
       initialPageParam: 0,
+    }),
+    queryClient.prefetchQuery({
+      queryKey: ["favorites"],
+      queryFn: () => Promise.resolve(favorites),
     }),
   ]);
 
