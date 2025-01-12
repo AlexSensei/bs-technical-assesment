@@ -6,6 +6,25 @@ import {
   QueryClient,
   dehydrate,
 } from "@tanstack/react-query";
+import { getProducts } from "@/app/actions";
+import { PRODUCTS_PER_PAGE } from "@/hooks/useProducts";
+import { ProductCategories } from "@/types/product";
+
+// Generate static params for first 6 products of each category
+export async function generateStaticParams() {
+  const categories: ProductCategories[] = ["top", "exclusive", "recent"];
+
+  const allProducts = await Promise.all(
+    categories.map((category) => getProducts(category, 0, PRODUCTS_PER_PAGE))
+  );
+
+  // Flatten the array of products and map to params
+  const params = allProducts.flat().map((product) => ({
+    id: product.id,
+  }));
+
+  return params;
+}
 
 interface ProductPageProps {
   params: Promise<{
