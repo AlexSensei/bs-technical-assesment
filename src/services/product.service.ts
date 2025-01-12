@@ -49,7 +49,6 @@ class ProductService extends ApiService {
   }
 
   async removeFromFavorites(productId: string) {
-    console.log("REMOVE FROM FAVORITES");
     return this.delete<void>(
       "/favorites",
       {

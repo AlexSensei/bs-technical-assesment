@@ -54,7 +54,7 @@ export default function Comments({ productId }: CommentsProps) {
   if (isLoading) {
     return <div>Loading comments...</div>;
   }
-  console.log({ comments });
+
   if (!comments || comments.length === 0) {
     return (
       <CommentsSection>
